@@ -11,7 +11,7 @@
           "compile",
           "command line",
           "gulp",
-          "gulpplugin",
+          "gulpplugin"
   ],
   "peerDependencies": {
     "gulp-util": "^3.0.8",
