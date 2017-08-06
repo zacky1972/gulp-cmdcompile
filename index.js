@@ -36,7 +36,12 @@ module.exports = function GulpCmdCompile(pgm, add_args = [], options = {})
         proc.on('close', (code) => {
             if (code === 0) {
                 // succeed
-                file.contents = fs.createReadStream(out_flname);
+                fs.readFile(out_flname, (err, data) => {
+                    file.contents = data;
+                    fs.unlinkSync(out_flname);
+                    this.push(file);
+                    cb();
+                });
                 file.stat = fs.lstatSync(out_flname);
 
                 if (fn_trans !== 'none') {
@@ -51,9 +56,6 @@ module.exports = function GulpCmdCompile(pgm, add_args = [], options = {})
                     }
                 }
                 
-                fs.unlinkSync(out_flname);
-                this.push(file);
-                cb();
             } else {
                 // fail
                 this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL: %s", file.path));
