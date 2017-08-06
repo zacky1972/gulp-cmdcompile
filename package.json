@@ -1,0 +1,20 @@
+{
+  "name": "gulp-cmdcompile",
+  "version": "1.0.0",
+  "description": "Command line compilation plugin for gulp.js",
+  "main": "index.js",
+  "repository": "https://github.com/giantshawn/gulp-cmdcompile.git",
+  "author": "Shawn Li <shawn@shawnli.org>",
+  "license": "MIT",
+  "keywords": [
+          "build",
+          "compile",
+          "command line",
+          "gulp",
+          "gulpplugin",
+  ],
+  "peerDependencies": {
+    "gulp-util": "^3.0.8",
+    "through2": "^2.0.3"
+  }
+}
