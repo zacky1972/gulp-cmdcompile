@@ -1,6 +1,6 @@
 {
   "name": "gulp-cmdcompile",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Command line compilation plugin for gulp.js",
   "main": "index.js",
   "repository": "https://github.com/giantshawn/gulp-cmdcompile.git",
