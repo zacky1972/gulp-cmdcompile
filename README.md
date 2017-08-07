@@ -14,7 +14,7 @@ $ npm install --save-dev gulp-cmdcompile
 ```
 ### Yarn
 ```bash
-$ yarn add -dev gulp-cmdcompile
+$ yarn add --dev gulp-cmdcompile
 ```
 
 Example
