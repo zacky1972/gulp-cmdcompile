@@ -38,6 +38,10 @@ gulp.task('build-file', function () {
 });
 ```
 
+Mind that you should add `{read: false}` option to to forbid file content loading in gulp.src(). While it's not totally
+contradict with underlying mechanism of gulp-cmdcompile, it's a good practice to be explicit in your program and this
+plugin force your to do that.
+
 Documentation
 -------------
 ### cmdcompile(program [, prog_arglist] [, options])
