@@ -10,11 +10,11 @@ Installation
 --------------
 ### NPM
 ```bash
-$ npm install gulp-cmdcompile
+$ npm install --save-dev gulp-cmdcompile
 ```
 ### Yarn
 ```bash
-$ yarn add gulp-cmdcompile
+$ yarn add -dev gulp-cmdcompile
 ```
 
 Example
@@ -37,6 +37,37 @@ gulp.task('build-file', function () {
         .pipe(gulp.dest('build'));
 });
 ```
+
+Documentation
+-------------
+### cmdcompile(program [, prog_arglist] [, options])
+Calling cmdcompile will return a stream object suitable to feed in pipe line of gulp construct. It accept at most three
+arguments, while only the first one(program) is required.
+
+#### program
+*Type: String*  
+the program name this plugin should invoke to process source files. In most cases, command line compiler program should
+fit, like `g++` and `clang` or even `tc`(Typescript compiler) if you mean it.
+
+#### prog_arglist
+*Type: Array of String*  
+List of arguments that would passed to compiler through command line. You can specify any optimization, compiling macros
+and linked libraries here.
+
+#### options
+*Type: Object*  
+Currently two options are supported.  
+**print_debug** :  _true|false_  
+whether output compiler tool's stdout and stderr
+
+
+**filename_transform** : _none|stripext|&lt;function&gt;_  
+Default to none(no transformation). Providing stripext will strip output file's extension, commonly used in C/C++ program.
+You can also customize transformation rule by providing a function that accept single argument as source file name and
+return target file name in any way you wish.
+
+
+
 
 
 MIT License
