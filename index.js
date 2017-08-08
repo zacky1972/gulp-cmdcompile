@@ -58,7 +58,7 @@ module.exports = function GulpCmdCompile(pgm, add_args = [], options = {})
                 
             } else {
                 // fail
-                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL: %s", file.path));
+                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL: " + file.path));
                 cb();
             }
         });
