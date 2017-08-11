@@ -30,7 +30,7 @@ gulp.task('build-file', function () {
         .pipe(changed('build', {
             transformPath: p => path.join(path.dirname(p), path.basename(p, '.cc'))
         }))
-        .pipe(cmdcompile('g++', [], {
+        .pipe(cmdcompile('g++', ['-std=c++11'], ['-lpthread'], {
             print_build: true, 
             filename_transform: 'stripext'
         }))
@@ -44,7 +44,7 @@ plugin force your to do that.
 
 Documentation
 -------------
-### cmdcompile(program [, prog_arglist] [, options])
+### cmdcompile(program [, pre_arglist] [, post_arglist] [, options])
 Calling cmdcompile will return a stream object suitable to feed in pipe line of gulp construct. It accept at most three
 arguments, while only the first one(program) is required.
 
@@ -53,12 +53,16 @@ arguments, while only the first one(program) is required.
 the program name this plugin should invoke to process source files. In most cases, command line compiler program should
 fit, like `g++` and `clang` or even `tc`(Typescript compiler) if you mean it.
 
-#### prog_arglist
+#### pre_arglist (optional)
 *Type: Array of String*  
-List of arguments that would passed to compiler through command line. You can specify any optimization, compiling macros
-and linked libraries here.
+List of arguments that would passed to compiler through command line *before* source file.
+You can specify any optimization and compiling macros here.
 
-#### options
+# post_arglist (optional)
+List of arguments that would passed to compiler through command line *after* source file.
+You can specify linked libraries here.
+
+#### options (optional)
 *Type: Object*  
 Currently two options are supported.  
 **print_debug** :  _true|false_  
@@ -69,8 +73,6 @@ whether output compiler tool's stdout and stderr
 Default to none(no transformation). Providing stripext will strip output file's extension, commonly used in C/C++ program.
 You can also customize transformation rule by providing a function that accept single argument as source file name and
 return target file name in any way you wish.
-
-
 
 
 

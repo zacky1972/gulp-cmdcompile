@@ -5,11 +5,25 @@ const through = require('through2');
 
 const gutil = require('gulp-util');
 
-module.exports = function GulpCmdCompile(pgm, add_args = [], options = {})
+module.exports = function GulpCmdCompile(pgm, ...extra_args)
 {
     const PLUGIN_NAME = 'gulp-cmdcompile';
     const PluginError = gutil.PluginError;
     const pid = process.pid.toString();
+
+    let pre_args, post_args, options = {};
+    if (extra_args.length > 0) {
+        const last_e = extra_args[extra_args.length-1];
+        if (typeof last_e === 'object' && !Array.isArray(last_e)) {
+            options = extra_args[extra_args.length-1];
+            extra_args = extra_args.slice(0, -1)
+        }
+
+        [pre_args, post_args] = extra_args;
+    }
+
+    pre_args = pre_args || [];
+    post_args = post_args || [];
 
     const print_build = options.print_build || false;
     const fn_trans = options.filename_transform || 'none';
@@ -27,7 +41,7 @@ module.exports = function GulpCmdCompile(pgm, add_args = [], options = {})
         const out_flname = file.path + '.' + pid + '.gulpcompile';
         const out_arg = (options.output_opt || '-o') + ' ' + out_flname;
 
-        let proc = spawn(pgm, add_args.concat([file.path, out_arg]), {shell: true});
+        let proc = spawn(pgm, pre_args.concat([file.path, out_arg], post_args), {shell: true});
         if (options.print_build) {
             proc.stdout.pipe(process.stdout);
             proc.stderr.pipe(process.stderr);
