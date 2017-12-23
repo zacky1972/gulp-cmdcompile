@@ -1,6 +1,6 @@
 {
   "name": "gulp-parcel",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "parcel plugin for gulp.js",
   "main": "index.js",
   "repository": "https://github.com/zacky1972/gulp-parcel.git",
@@ -11,9 +11,5 @@
     "parcel",
     "gulp",
     "gulpplugin"
-  ],
-  "peerDependencies": {
-    "gulp-util": "^3.0.8",
-    "through2": "^2.0.3"
-  }
+  ]
 }
