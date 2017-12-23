@@ -10,18 +10,25 @@ Installation
 --------------
 ### NPM
 ```bash
+$ npm install --global parcel-bundler
 $ npm install --save-dev gulp-parcel
 ```
 ### Yarn
 ```bash
+$ yarn global add parcel-bundler
 $ yarn add --dev gulp-parcel
 ```
 
 Example
 -------
-```js
-```
+```coffee
+parcel = require 'gulp-parcel'
 
+gulp.task 'build:js', () ->
+  gulp.src 'source/javascripts/all.js', {read:false}
+    .pipe parcel(['build'])
+    .pipe gulp.dest('build/javascripts/')
+```
 
 
 
