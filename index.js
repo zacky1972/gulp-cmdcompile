@@ -5,9 +5,24 @@ const through = require('through2');
 
 const gutil = require('gulp-util');
 
-module.exports = function GulpCmdCompile(pgm, ...extra_args)
+function removeDirectory(dir)
 {
-    const PLUGIN_NAME = 'gulp-cmdcompile';
+    try {
+        var files = fs.readdirSync(dir);
+        for (var file in files) {
+            fs.unlinkSync(dir + '/' + files[file])
+        }
+        fs.rmdirSync(dir);
+    } catch (err) {
+        if(err.code === 'ENOENT') {
+            return false;
+        }
+    }
+}
+
+module.exports = function GulpParcel(...extra_args)
+{
+    const PLUGIN_NAME = 'gulp-parcel';
     const PluginError = gutil.PluginError;
     const pid = process.pid.toString();
 
@@ -38,14 +53,12 @@ module.exports = function GulpCmdCompile(pgm, ...extra_args)
             return;
         }
 
-        const out_flname = file.path + '.' + pid + '.gulpcompile';
-        const out_arg = (options.output_opt || '-o') + ' ' + out_flname;
+        const out_dir = '.tmp-gulp-compile-' + pid;
+        const out_flname = out_dir + '/' + file.path.substring(file.path.lastIndexOf('/')+1, file.path.length);
 
-        let proc = spawn(pgm, pre_args.concat([file.path, out_arg], post_args), {shell: true});
-        if (options.print_build) {
-            proc.stdout.pipe(process.stdout);
-            proc.stderr.pipe(process.stderr);
-        }
+        let proc = spawn('parcel', pre_args.concat([file.path], post_args, '--out-dir .tmp-gulp-compile-' + pid), {shell: true});
+        proc.stdout.pipe(process.stdout);
+        proc.stderr.pipe(process.stderr);
         proc.on('error', (err) => this.emit('error', new PluginError(PLUGIN_NAME, err.toString())));
         proc.on('close', (code) => {
             if (code === 0) {
@@ -54,24 +67,13 @@ module.exports = function GulpCmdCompile(pgm, ...extra_args)
                     file.contents = data;
                     fs.unlinkSync(out_flname);
                     this.push(file);
+                    removeDirectory(out_dir);
                     cb();
                 });
                 file.stat = fs.lstatSync(out_flname);
-
-                if (fn_trans !== 'none') {
-                    if (fn_trans === 'stripext') {
-                        let fpath = path.parse(file.path);
-                        file.path = path.join(fpath.root, fpath.dir, fpath.name);
-                    } else if (typeof fn_trans === 'function') {
-                        let fpath = path.parse(file.path);
-                        file.path = path.join(fpath.root, fpath.dir, fn_trans(fpath.base));
-                    } else {
-                        this.emit('error', new PluginError(PLUGIN_NAME, "invalid filename_transform option, omit."));
-                    }
-                }
-                
             } else {
                 // fail
+                removeDirectory(out_dir);
                 this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL: " + file.path));
                 cb();
             }
