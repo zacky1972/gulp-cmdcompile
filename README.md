@@ -26,39 +26,15 @@ parcel = require 'gulp-parcel'
 
 gulp.task 'build:js', () ->
   gulp.src 'source/javascripts/all.js', {read:false}
-    .pipe parcel(['build'], [], {
-      wd: './source'
-    })
+    .pipe parcel()
     .pipe gulp.dest('build/javascripts/')
 ```
 
 Documentation
 -------
-### parcel([pre_arglist][, post_arglist][, options])
+### parcel([options])
 
-Calling parcel as follows:
-
-```
-parcel [pre_arglist] src [post_arglist]
-```
-
-For example, when pre_arglist = `['build']` and when post_arglist = `['--no-minify']`, parcel will be called as follows:
-
-```
-parcel build src --no-minify
-```
-
-#### pre_arglist (optional)
-
-*Type: Array of String*
-
-List of arguments that would passed to parcel before source file. You can specify a command here.
-
-#### post_arglist (optional)
-
-*Type: Array of String*
-
-List of arguments that would passed to parcel after source file. You can specify any options for parcel here.
+call parcel `gulp.src` with options 
 
 #### options (optional)
 
@@ -66,8 +42,14 @@ List of arguments that would passed to parcel after source file. You can specify
 
 Currently one option is supported.
 
-**wd:** *string*
-working directory for parcel
+**watch:** *true or false* (default: false)
+**outDir:** *string* (default: temporary directory)
+**cache:** *true or false* (default: true)
+**cacheDir:** *true or false* (default: '.cache')
+**killWorkers:** *true or false* (default: true)
+**minify:** *true or false* (default: !watch)
+**hmr:** *true or false* (default: watch)
+**logLevel:** *number* (default: 3)
 
 MIT License
 ----------------------------
