@@ -26,11 +26,48 @@ parcel = require 'gulp-parcel'
 
 gulp.task 'build:js', () ->
   gulp.src 'source/javascripts/all.js', {read:false}
-    .pipe parcel(['build'])
+    .pipe parcel(['build'], [], {
+      wd: './source'
+    })
     .pipe gulp.dest('build/javascripts/')
 ```
 
+Documentation
+-------
+### parcel([pre_arglist][, post_arglist][, options])
 
+Calling parcel as follows:
+
+```
+parcel [pre_arglist] src [post_arglist]
+```
+
+For example, when pre_arglist = `['build']` and when post_arglist = `['--no-minify']`, parcel will be called as follows:
+
+```
+parcel build src --no-minify
+```
+
+#### pre_arglist (optional)
+
+*Type: Array of String*
+
+List of arguments that would passed to parcel before source file. You can specify a command here.
+
+#### post_arglist (optional)
+
+*Type: Array of String*
+
+List of arguments that would passed to parcel after source file. You can specify any options for parcel here.
+
+#### options (optional)
+
+*Type: Object*
+
+Currently one option is supported.
+
+**wd:** *string*
+working directory for parcel
 
 MIT License
 ----------------------------

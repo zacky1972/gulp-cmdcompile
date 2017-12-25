@@ -40,8 +40,7 @@ module.exports = function GulpParcel(...extra_args)
     pre_args = pre_args || [];
     post_args = post_args || [];
 
-    const print_build = options.print_build || false;
-    const fn_trans = options.filename_transform || 'none';
+    const wd = options.wd || '.';
 
     return through.obj(function (file, encoding, cb) {
         // file.path
@@ -53,10 +52,10 @@ module.exports = function GulpParcel(...extra_args)
             return;
         }
 
-        const out_dir = '.tmp-gulp-compile-' + pid;
+        const out_dir = wd + '/.tmp-gulp-compile-' + pid;
         const out_flname = out_dir + '/' + file.path.substring(file.path.lastIndexOf('/')+1, file.path.length);
 
-        let proc = spawn('parcel', pre_args.concat([file.path], post_args, '--out-dir .tmp-gulp-compile-' + pid), {shell: true});
+        let proc = spawn('parcel', pre_args.concat([file.path], post_args, '--out-dir .tmp-gulp-compile-' + pid), {shell: true, cwd: wd});
         proc.stdout.pipe(process.stdout);
         proc.stderr.pipe(process.stderr);
         proc.on('error', (err) => this.emit('error', new PluginError(PLUGIN_NAME, err.toString())));
