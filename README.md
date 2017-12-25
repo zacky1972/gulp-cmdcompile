@@ -11,12 +11,10 @@ Installation
 ### NPM
 ```bash
 $ npm install --global parcel-bundler
-$ npm install --save-dev gulp-parcel
 ```
 ### Yarn
 ```bash
 $ yarn global add parcel-bundler
-$ yarn add --dev gulp-parcel
 ```
 
 Example
