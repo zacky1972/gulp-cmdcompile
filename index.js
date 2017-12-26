@@ -38,8 +38,6 @@ module.exports = function GulpParcel(...options)
     options.outDir = '.tmp-gulp-compile-' + pid;
 
     return through.obj(function (file, encoding, cb) {
-        console.log(file);
-
         if (!!file.contents) {
             this.emit('error', new PluginError(PLUGIN_NAME, "File has already been processed"));
             cb(null, file);
