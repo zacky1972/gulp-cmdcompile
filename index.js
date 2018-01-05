@@ -2,8 +2,7 @@ const parcelBundler = require('parcel-bundler');
 const fs = require('fs');
 const path = require('path');
 const through = require('through2');
-
-const gutil = require('gulp-util');
+const PluginError = require('plugin-error');
 
 function removeDirectory(dir)
 {
@@ -27,15 +26,13 @@ function removeDirectory(dir)
 module.exports = function GulpParcel(...options)
 {
     const PLUGIN_NAME = 'gulp-parcel';
-    const PluginError = gutil.PluginError;
     const pid = process.pid.toString();
 
     options.watch = {
         value: 'watch' in options ? options.watch : false
     };
     options.production = !options.watch || true;
-
-    options.outDir = '.tmp-gulp-compile-' + pid;
+    options.outDir = 'outDir' in options ? options.outDir : ('.tmp-gulp-compile-' + pid);
 
     return through.obj(function (file, encoding, cb) {
         if (!!file.contents) {
@@ -43,8 +40,16 @@ module.exports = function GulpParcel(...options)
             cb(null, file);
             return;
         }
-
-        const out_flname = options.outDir + '/' + file.path.substring(file.path.lastIndexOf('/') + 1, file.path.length);
+        
+        // slashes on unix os 
+        // backslashes on windows
+		let slashes = '/';
+		
+		if( file.path.lastIndexOf(slashes) === -1){
+			slashes = '\\';
+        }
+        
+        let out_flname = options.outDir + slashes + file.path.substr(file.path.lastIndexOf(slashes) + 1);
 
         process.on('SIGINT', () => {
             removeDirectory(options.outDir);
@@ -58,8 +63,20 @@ module.exports = function GulpParcel(...options)
                 this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
                 cb(null, file);
             }
+			
+			// In case dealing with Pug files
+			// at this stage Pub files should've been transformed to html
+			if( out_flname.substr(out_flname.lastIndexOf('.') + 1).trim().toLowerCase() === 'pug' ){
+				out_flname = out_flname.substr(0,out_flname.lastIndexOf('.') + 1) + 'html';
+			}
             try {
                 fs.readFile(out_flname, (err, data) => {
+                    // when out file name isn't correct/readable/accessible
+                    // data can be undefined
+					if(data === undefined){
+						var err = 'Unable to read to ' + out_flname;
+						throw err;
+					}
                     file.contents = data;
                     this.push(file);
                     if(options.production) {
