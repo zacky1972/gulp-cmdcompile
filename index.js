@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const through = require('through2');
 
-const gutil = require('gulp-util');
+const PluginError = require('plugin-error');
 
 function removeDirectory(dir)
 {
@@ -27,7 +27,6 @@ function removeDirectory(dir)
 module.exports = function GulpParcel(...options)
 {
     const PLUGIN_NAME = 'gulp-parcel';
-    const PluginError = gutil.PluginError;
     const pid = process.pid.toString();
 
     options.watch = {
