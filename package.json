@@ -1,6 +1,6 @@
 {
   "name": "gulp-parcel",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "parcel plugin for gulp.js",
   "main": "index.js",
   "repository": "https://github.com/zacky1972/gulp-parcel.git",
