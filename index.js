@@ -28,11 +28,17 @@ module.exports = function GulpParcel(...options)
     const PLUGIN_NAME = 'gulp-parcel';
     const pid = process.pid.toString();
 
+    if(options.length > 0) {
+        options = options[0];
+    }
+
     options.watch = {
-        value: 'watch' in options ? options.watch : false
+        value: options.watch ? options.watch : false
     };
     options.production = !options.watch || true;
-    options.outDir = 'outDir' in options ? options.outDir : ('.tmp-gulp-compile-' + pid);
+    options.outDir = options.outDir ? options.outDir : ('.tmp-gulp-compile-' + pid);
+
+    console.log(options);
 
     return through.obj(function (file, encoding, cb) {
         if (!!file.contents) {
@@ -79,7 +85,7 @@ module.exports = function GulpParcel(...options)
 					}
                     file.contents = data;
                     this.push(file);
-                    if(options.production) {
+                    if(options.production && options.outDir.match(/^.tmp-gulp-compile/)) {
                         removeDirectory(options.outDir);                
                     }
                     cb(null, file);
