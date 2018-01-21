@@ -41,24 +41,34 @@ gulp.task 'build', () ->
 
 Documentation
 -------
-### parcel([options])
+### parcel([options[, g_options]])
 
-call parcel `gulp.src` with options 
+call parcel `gulp.src` with options and g_options 
 
 #### options (optional)
 
 *Type: Object*
 
-Currently one option is supported.
+Currently the following options are supported:
 
-**watch:** *true or false* (default: false)
-**outDir:** *string* (default: temporary directory)
-**cache:** *true or false* (default: true)
-**cacheDir:** *true or false* (default: '.cache')
-**killWorkers:** *true or false* (default: true)
-**minify:** *true or false* (default: !watch)
-**hmr:** *true or false* (default: watch)
-**logLevel:** *number* (default: 3)
+* **watch:** *true or false* (default: false)
+* **outDir:** *string* (default: temporary directory)
+* **cache:** *true or false* (default: true)
+* **cacheDir:** *true or false* (default: '.cache')
+* **killWorkers:** *true or false* (default: true)
+* **minify:** *true or false* (default: !watch)
+* **hmr:** *true or false* (default: watch)
+* **logLevel:** *number* (default: 3)
+* **publicURL:** *string*
+
+#### g_options (optional)
+
+*Type: Object*
+
+Currently one option are supported:
+
+* **source:** *string*
+
 
 MIT License
 ----------------------------
