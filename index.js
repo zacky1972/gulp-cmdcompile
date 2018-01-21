@@ -28,7 +28,13 @@ module.exports = function GulpParcel(...options)
     const PLUGIN_NAME = 'gulp-parcel';
     const pid = process.pid.toString();
 
+    let g_options;
     if(options.length > 0) {
+        if(options.length > 1) {
+            g_options = options[1];
+        } else {
+            g_options = {};
+        }
         options = options[0];
     }
 
@@ -36,9 +42,10 @@ module.exports = function GulpParcel(...options)
         value: options.watch ? options.watch : false
     };
     options.production = !options.watch || true;
+    const isTmp = options.outDir ? false : true;
     options.outDir = options.outDir ? options.outDir : ('.tmp-gulp-compile-' + pid);
 
-    console.log(options);
+    const source = g_options.source ? g_options.source : '';
 
     return through.obj(function (file, encoding, cb) {
         if (!!file.contents) {
@@ -55,17 +62,40 @@ module.exports = function GulpParcel(...options)
 			slashes = '\\';
         }
         
-        let out_flname = options.outDir + slashes + file.path.substr(file.path.lastIndexOf(slashes) + 1);
+        let out_flname;
+        if(g_options.source && !isTmp) {
+            out_flname = file.path.replace(source, options.outDir);
+        } else {
+            out_flname = options.outDir + slashes + file.path.substr(file.path.lastIndexOf(slashes) + 1);
+        }
+        
+        let options_c = {}, outDir;
+        Object.assign(options_c, options);
+        outDir = file.path.substr(file.path.lastIndexOf(source));
+        let position = outDir.lastIndexOf(slashes) - 1;
+        position = outDir.lastIndexOf(slashes, position);
+        if(position < 0) {
+            outDir = options.outDir;
+        } else {
+            outDir = outDir.substr(position + 1);
+            outDir = outDir.substr(0, outDir.lastIndexOf(slashes));
+            outDir = options.outDir + slashes + outDir;
+        }
+        options_c.outDir = outDir;
 
         process.on('SIGINT', () => {
-            removeDirectory(options.outDir);
+            if(isTmp) {
+                removeDirectory(options.outDir);
+            }
             process.exit();
         });
 
-        const parcel = new parcelBundler(file.path, options);
+        const parcel = new parcelBundler(file.path, options_c);
         parcel.bundle().then(bundle => {
             if(parcel.errored) {
-                removeDirectory(options.outDir);
+                if(isTmp) {
+                    removeDirectory(options.outDir);
+                }
                 this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
                 cb(null, file);
             }
@@ -73,7 +103,7 @@ module.exports = function GulpParcel(...options)
 			// In case dealing with Pug files
 			// at this stage Pub files should've been transformed to html
 			if( out_flname.substr(out_flname.lastIndexOf('.') + 1).trim().toLowerCase() === 'pug' ){
-				out_flname = out_flname.substr(0,out_flname.lastIndexOf('.') + 1) + 'html';
+				out_flname = out_flname.substr(0, out_flname.lastIndexOf('.') + 1) + 'html';
 			}
             try {
                 fs.readFile(out_flname, (err, data) => {
@@ -85,14 +115,16 @@ module.exports = function GulpParcel(...options)
 					}
                     file.contents = data;
                     this.push(file);
-                    if(options.production && options.outDir.match(/^.tmp-gulp-compile/)) {
+                    if(options.production && isTmp) {
                         removeDirectory(options.outDir);                
                     }
                     cb(null, file);
                 });
                 file.stat = fs.lstatSync(out_flname);
             } catch (err) {
-                removeDirectory(options.outDir);
+                if(isTmp) {
+                    removeDirectory(options.outDir);
+                }
                 this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
                 cb(null, file);
             }
