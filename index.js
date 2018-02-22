@@ -38,10 +38,8 @@ module.exports = function GulpParcel(...options)
         options = options[0];
     }
 
-    options.watch = {
-        value: options.watch ? options.watch : false
-    };
-    options.production = !options.watch || true;
+    options.watch = (typeof(options.watch) == "undefined") ? false : options.watch;
+    options.production = (typeof(options.production) == "undefined") ? !options.watch : options.production;
     const isTmp = options.outDir ? false : true;
     options.outDir = options.outDir ? options.outDir : ('.tmp-gulp-compile-' + pid);
 
