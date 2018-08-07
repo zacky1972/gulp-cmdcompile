@@ -51,22 +51,22 @@ module.exports = function GulpParcel(...options)
             cb(null, file);
             return;
         }
-        
-        // slashes on unix os 
+
+        // slashes on unix os
         // backslashes on windows
 		let slashes = '/';
-		
+
 		if( file.path.lastIndexOf(slashes) === -1){
 			slashes = '\\';
         }
-        
+
         let out_flname;
         if(g_options.source && !isTmp) {
             out_flname = file.path.replace(source, options.outDir);
         } else {
             out_flname = options.outDir + slashes + file.path.substr(file.path.lastIndexOf(slashes) + 1);
         }
-        
+
         let options_c = {}, outDir;
         Object.assign(options_c, options);
         outDir = file.path.substr(file.path.lastIndexOf(source));
@@ -97,7 +97,7 @@ module.exports = function GulpParcel(...options)
                 this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
                 cb(null, file);
             }
-			
+
 			// In case dealing with Pug files
 			// at this stage Pub files should've been transformed to html
 			if( out_flname.substr(out_flname.lastIndexOf('.') + 1).trim().toLowerCase() === 'pug' ){
@@ -114,7 +114,7 @@ module.exports = function GulpParcel(...options)
                     file.contents = data;
                     this.push(file);
                     if(options.production && isTmp) {
-                        removeDirectory(options.outDir);                
+                        removeDirectory(options.outDir);
                     }
                     cb(null, file);
                 });
