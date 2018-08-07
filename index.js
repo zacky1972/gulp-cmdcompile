@@ -28,12 +28,10 @@ module.exports = function GulpParcel(...options)
     const PLUGIN_NAME = 'gulp-parcel';
     const pid = process.pid.toString();
 
-    let g_options;
+    let g_options = {};
     if(options.length > 0) {
         if(options.length > 1) {
             g_options = options[1];
-        } else {
-            g_options = {};
         }
         options = options[0];
     }
