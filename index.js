@@ -39,6 +39,10 @@ module.exports = function GulpParcel(...options)
     }
 
     options.watch = (typeof(options.watch) == "undefined") ? false : options.watch;
+    options.port = (typeof(options.port) == "undefined" || isNaN(parseInt(options.port)) ) ? undefined : parseInt(options.port);
+    options.serve = (typeof(options.serve) == "undefined") ? false : options.serve;
+    options.sourceMaps = (typeof(options.sourceMaps) == "undefined") ? false : options.sourceMaps;
+
     options.production = (typeof(options.production) == "undefined") ? !options.watch : options.production;
     const isTmp = options.outDir ? false : true;
     options.outDir = options.outDir ? options.outDir : ('.tmp-gulp-compile-' + pid);
@@ -89,7 +93,16 @@ module.exports = function GulpParcel(...options)
         });
 
         const parcel = new parcelBundler(file.path, options_c);
-        parcel.bundle().then(bundle => {
+        let executeParcel;
+
+        //To run parcel server when the server is enabled or port is specified
+        if(options_c.serve || options_c.port) {
+            executeParcel = parcel.serve(options_c.port);
+        } else {
+            executeParcel = parcel.bundle();
+        }
+
+        executeParcel.then(bundle => {
             if(parcel.errored) {
                 if(isTmp) {
                     removeDirectory(options.outDir);
@@ -129,5 +142,3 @@ module.exports = function GulpParcel(...options)
         });
     });
 }
-
-

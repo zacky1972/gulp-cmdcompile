@@ -52,6 +52,9 @@ call parcel `gulp.src` with options and g_options
 Currently the following options are supported:
 
 * **watch:** *true or false* (default: false)
+* **serve:** *true or false* (default: false)
+* **port:** *numbere* (default: 1234)
+* **sourceMaps:** *true or false* (default: false)
 * **outDir:** *string* (default: temporary directory)
 * **cache:** *true or false* (default: true)
 * **cacheDir:** *true or false* (default: '.cache')
