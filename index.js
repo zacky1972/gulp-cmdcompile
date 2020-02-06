@@ -58,13 +58,6 @@ module.exports = function GulpParcel(...options)
 			slashes = '\\';
         }
 
-        let out_flname;
-        if(g_options.source && !isTmp) {
-            out_flname = file.path.replace(source, options.outDir);
-        } else {
-            out_flname = options.outDir + slashes + file.path.substr(file.path.lastIndexOf(slashes) + 1);
-        }
-
         let options_c = {}, outDir;
         Object.assign(options_c, options);
         outDir = file.path.substr(file.path.lastIndexOf(source));
@@ -92,15 +85,13 @@ module.exports = function GulpParcel(...options)
                 if(isTmp) {
                     removeDirectory(options.outDir);
                 }
-                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
+                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path + "\n" + err));
                 cb(null, file);
             }
 
-			// In case dealing with Pug files
-			// at this stage Pub files should've been transformed to html
-			if( out_flname.substr(out_flname.lastIndexOf('.') + 1).trim().toLowerCase() === 'pug' ){
-				out_flname = out_flname.substr(0, out_flname.lastIndexOf('.') + 1) + 'html';
-			}
+            // use the filename parcel assigned which will exist
+            const out_flname = bundle.name
+
             try {
                 fs.readFile(out_flname, (err, data) => {
                     // when out file name isn't correct/readable/accessible
@@ -121,7 +112,7 @@ module.exports = function GulpParcel(...options)
                 if(isTmp) {
                     removeDirectory(options.outDir);
                 }
-                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
+                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path + "\n" + err));
                 cb(null, file);
             }
         });
