@@ -1,7 +1,7 @@
 gulp-parcel ![NPM version](https://img.shields.io/npm/v/gulp-parcel.svg?style=flat)
 ====================================================================================================================================================
 
-By Susumu Yamazaki &lt;zacky1972@gmail.com&gt; 
+By Susumu Yamazaki &lt;zacky1972@gmail.com&gt;
 
 gulp-parcel is a gulp plugin to exec parcel command.
 
@@ -43,7 +43,7 @@ Documentation
 -------
 ### parcel([options[, g_options]])
 
-call parcel `gulp.src` with options and g_options 
+call parcel `gulp.src` with options and g_options
 
 #### options (optional)
 
@@ -57,6 +57,7 @@ Currently the following options are supported:
 * **cacheDir:** *true or false* (default: '.cache')
 * **killWorkers:** *true or false* (default: true)
 * **minify:** *true or false* (default: !watch)
+* **sourceMaps:** *true or false* (default: false)
 * **hmr:** *true or false* (default: watch)
 * **logLevel:** *number* (default: 3)
 * **publicURL:** *string*

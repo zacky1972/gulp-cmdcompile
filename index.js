@@ -40,22 +40,24 @@ module.exports = function GulpParcel(...options)
     options.production = (typeof(options.production) == "undefined") ? !options.watch : options.production;
     const isTmp = options.outDir ? false : true;
     options.outDir = options.outDir ? options.outDir : ('.tmp-gulp-compile-' + pid);
+    options.sourceMaps = (typeof(options.sourceMaps) == "undefined") ? false : options.sourceMaps;
 
     const source = g_options.source ? g_options.source : '';
 
     return through.obj(function (file, encoding, cb) {
         if (!!file.contents) {
-            this.emit('error', new PluginError(PLUGIN_NAME, "File has already been processed"));
-            cb(null, file);
+            const error = new PluginError(PLUGIN_NAME, "File has already been processed");
+            this.emit('error', error);
+            cb(error, file);
             return;
         }
 
         // slashes on unix os
         // backslashes on windows
-		let slashes = '/';
+        let slashes = '/';
 
-		if( file.path.lastIndexOf(slashes) === -1){
-			slashes = '\\';
+        if( file.path.lastIndexOf(slashes) === -1){
+            slashes = '\\';
         }
 
         let out_flname;
@@ -88,42 +90,51 @@ module.exports = function GulpParcel(...options)
 
         const parcel = new parcelBundler(file.path, options_c);
         parcel.bundle().then(bundle => {
-            if(parcel.errored) {
+            if(parcel.error) {
                 if(isTmp) {
                     removeDirectory(options.outDir);
                 }
-                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
-                cb(null, file);
+                const error = new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path);
+                this.emit('error', error);
+                cb(error, file);
             }
 
-			// In case dealing with Pug files
-			// at this stage Pub files should've been transformed to html
-			if( out_flname.substr(out_flname.lastIndexOf('.') + 1).trim().toLowerCase() === 'pug' ){
-				out_flname = out_flname.substr(0, out_flname.lastIndexOf('.') + 1) + 'html';
-			}
             try {
-                fs.readFile(out_flname, (err, data) => {
-                    // when out file name isn't correct/readable/accessible
-                    // data can be undefined
-					if(data === undefined){
-						var err = 'Unable to read to ' + out_flname;
-						throw err;
-					}
-                    file.contents = data;
-                    this.push(file);
-                    if(options.production && isTmp) {
-                        removeDirectory(options.outDir);
-                    }
-                    cb(null, file);
-                });
-                file.stat = fs.lstatSync(out_flname);
+                const readFile = (bundleName, finish = true) => {
+                    const newFile = file.clone();
+                    fs.readFile(bundleName, (err, data) => {
+                        // when out file name isn't correct/readable/accessible
+                        // data can be undefined
+                        if(data === undefined){
+                            var err = 'Unable to read to ' + bundleName;
+                            throw err;
+                        }
+                        newFile.contents = data;
+                        this.push(newFile);
+                        if(options.production && isTmp) {
+                            removeDirectory(options.outDir);
+                        }
+                        if (finish) cb();
+                    });
+                    newFile.stat = fs.lstatSync(bundleName);
+                    newFile.basename = path.basename(bundleName);
+                    newFile.extname = path.extname(bundleName);
+                }
+                readFile(bundle.name, !options.sourceMaps);
+                if (options.sourceMaps) {
+                    const mapBundle = bundle.getSiblingBundle('map');
+                    readFile(mapBundle.name, true);
+                }
             } catch (err) {
                 if(isTmp) {
                     removeDirectory(options.outDir);
                 }
-                this.emit('error', new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path));
-                cb(null, file);
+                const error = new PluginError(PLUGIN_NAME, "Build FAIL:" + file.path);
+                this.emit('error', error);
+                cb(error, file);
             }
+        }).catch((error) => {
+            cb(error, file);
         });
     });
 }
